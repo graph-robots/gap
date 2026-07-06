@@ -26,12 +26,12 @@ paths serve as-is.
 | `assets/data/selflearn.json` + `assets/img/minimaps/` | per-iteration graph renders + real metrics from the popcorn self-learning reproduction run (12 iterations) — drives the iteration scrubber |
 | `assets/img/pipeline.png`, `architecture.png`, `self_learning_popcorn.png` | paper figures |
 | results tables in `index.html` | numbers from the paper (same as the review page) |
-| `assets/gap_corl2026_preprint.pdf` | compiled preprint |
 
 ## Updating
 
-- **arXiv link**: in `index.html`, replace the disabled `arXiv · soon` button
-  with `<a class="btn" href="https://arxiv.org/abs/XXXX.XXXXX">arXiv</a>`.
+- **arXiv link**: in `index.html`, turn the disabled `#paper-btn` into a live
+  link: `<a class="btn btn-primary" href="https://arxiv.org/abs/XXXX.XXXXX"
+  target="_blank" rel="noopener">📄 Paper (arXiv)</a>`.
 - **Graph explorer**: re-export with
   `python export_graph_json.py <workflow.json> assets/data/packing_graph.json`
   (script lives with the launch-video pipeline; uses `gap.viz.render` layout).
