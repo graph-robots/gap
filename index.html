@@ -72,7 +72,6 @@
     <div class="card card-hl reveal" style="--d:.12s"><span class="chip chip-green">VA</span><h3>Variational Automation</h3><p>A robot persistently performs <em>varying</em> instances: objects vary in geometry (different SKUs) and arrive in a distribution of poses — within a known, bounded workcell. <b>This is GaP’s target.</b></p></div>
     <div class="card reveal" style="--d:.19s"><span class="chip">GR</span><h3>Generalist Robotics</h3><p>A robot must perform a broad variety of open-ended tasks, mostly via model-free end-to-end VLA policies. Highly flexible, but not yet at commercial / industrial reliability.</p></div>
   </div>
-  <div class="callout reveal"><b>Why not just Code-as-Policy?</b> Single-agent CaP prompts a coding agent to emit free-form Python. For persistent, repeated execution this is unstructured: the context window grows, constraints are hard to obey, and agents are prone to hallucination and “cheating” on success metrics. GaP’s directed computation graph revives the structure proven in ROS — explicit data and control flow — and layers the open-world adaptivity of LLM coding agents on top, preserving an interpretable policy that stays reliable across a VA task’s many instances.</div>
 </section>
 
 <!-- ═══════════ GRAPH EXPLORER ═══════════ -->
