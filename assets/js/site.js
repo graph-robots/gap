@@ -1,4 +1,4 @@
-/* GaP site — reveals, video management, graph explorer, self-learning scrubber */
+/* GaP site — reveals, video management, interactive graph with node inspector */
 (() => {
 "use strict";
 const $ = (s, r = document) => r.querySelector(s);
@@ -65,7 +65,7 @@ if (typed && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
   step();
 } else if (typed) typed.textContent = PROMPT;
 
-/* ── graph explorer ──────────────────────────────────────────────────── */
+/* ── graph explorer with node inspector ──────────────────────────────── */
 const PAL = {
   tool:        ["#cfe3f7", "#2c6fb0"],
   script:      ["#d6efd6", "#3f8f47"],
@@ -75,6 +75,12 @@ const PAL = {
   end_success: ["#d6efd6", "#2f7d36"],
   end_failure: ["#f7d6d6", "#b03434"],
 };
+const TYPE_NAMES = {
+  tool: "tool call (MORSL service)", script: "synthesized script",
+  router: "router — dynamic dispatch", noop: "exit marker",
+  end_success: "terminal · success", end_failure: "terminal · failure",
+  subgraph: "nested subgraph",
+};
 const EDGE = { ctrl: "#5a5a66", ok: "#2e7d32", fail: "#c0392b" };
 const NS = "http://www.w3.org/2000/svg";
 const mk = (t, at, parent) => {
@@ -83,6 +89,52 @@ const mk = (t, at, parent) => {
   if (parent) parent.appendChild(el);
   return el;
 };
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+function showDetail(n) {
+  const panel = $("#node-detail");
+  const [fill, stroke] = PAL[n.type] || PAL.tool;
+  let h = `<div class="detail-head">
+    <span class="nchip" style="background:${fill};border-color:${stroke};color:#1c1c22">${esc(n.label)}</span>
+    <span class="tchip">${TYPE_NAMES[n.type] || n.type}</span>`;
+  if (n.lane) h += `<span class="tchip">subgraph: ${esc(n.lane)}</span>`;
+  h += `<button class="btn btn-mini detail-close" id="detail-close">✕ close</button></div>`;
+
+  if (n.tool) h += `<h4>tool</h4><div class="kv"><span class="k">service</span><span class="v">${esc(n.tool)}</span></div>`;
+  if (n.script) h += `<h4>script</h4><div class="kv"><span class="k">file</span><span class="v">${esc(n.script)}</span></div>`;
+
+  if (n.inputs && Object.keys(n.inputs).length) {
+    h += `<h4>execution inputs</h4><div class="kv">`;
+    for (const [k, v] of Object.entries(n.inputs)) {
+      const val = (v && typeof v === "object" && "$ref" in v)
+        ? `<span class="ref">$ref → ${esc(v["$ref"])}</span>`
+        : esc(JSON.stringify(v));
+      h += `<span class="k">${esc(k)}</span><span class="v">${val}</span>`;
+    }
+    h += `</div>`;
+  }
+  if (n.router) {
+    h += `<h4>routing</h4><div class="kv">`;
+    h += `<span class="k">router_field</span><span class="v">${esc(n.router.router_field ?? "")}</span>`;
+    for (const [lbl, dst] of Object.entries(n.router.mapping || {}))
+      h += `<span class="k">on “${esc(lbl)}”</span><span class="v">→ ${esc(dst)}</span>`;
+    h += `</div>`;
+  }
+  if (n.type.startsWith("end")) {
+    h += `<p class="hint">Terminal state: execution stops here and the outcome is reported${n.type === "end_failure" ? " as a failure — every red route in the graph converges on this node." : " as a success."}</p>`;
+  }
+  if (n.type === "noop") {
+    h += `<p class="hint">Marks the subgraph's exit: control returns to the top level, where the macro routes decide the next subgraph.</p>`;
+  }
+  if (n.code) h += `<h4>code — ${esc(n.script || "")}</h4><pre>${esc(n.code)}</pre>`;
+
+  panel.innerHTML = h;
+  panel.classList.add("open");
+  $("#detail-close").addEventListener("click", () => {
+    panel.classList.remove("open");
+    $$(".g-node.sel").forEach(x => x.classList.remove("sel"));
+  });
+}
 
 async function buildGraph() {
   const holder = $("#graph-svg-holder");
@@ -97,7 +149,7 @@ async function buildGraph() {
     mk("path", { d: "M 0 0 L 10 5 L 0 10 z", fill: col }, m);
   }
 
-  const items = [];   // [order, element]
+  const items = [];
   for (const ln of g.lanes) {
     const grp = mk("g", { class: "gv" }, svg);
     mk("rect", { class: "g-lane", x: ln.x, y: ln.y, width: ln.w, height: ln.h, rx: 14 }, grp);
@@ -134,7 +186,8 @@ async function buildGraph() {
   const tip = $("#graph-tip");
   for (const n of g.nodes) {
     const [fill, stroke] = PAL[n.type] || PAL.tool;
-    const grp = mk("g", { class: "g-node gv" }, svg);
+    const grp = mk("g", { class: "g-node gv", tabindex: 0, role: "button",
+      "aria-label": `Inspect node ${n.label}` }, svg);
     mk("rect", { x: n.x - g.nodeW / 2, y: n.y - g.nodeH / 2, width: g.nodeW,
       height: g.nodeH, rx: 9, fill, stroke }, grp);
     const nm = mk("text", { class: "nm", x: n.x, y: n.y + (n.sub ? -3 : 5) }, grp);
@@ -146,20 +199,26 @@ async function buildGraph() {
     }
     grp.addEventListener("mousemove", ev => {
       tip.hidden = false;
-      tip.innerHTML = `<b>${n.label}</b><br>${n.type.replace("_", " · ")}${n.sub ? `<br><span style="opacity:.75">${n.sub}</span>` : ""}`;
+      tip.innerHTML = `<b>${esc(n.label)}</b><br>${TYPE_NAMES[n.type] || n.type}<br><span style="opacity:.7">click to inspect ↓</span>`;
       tip.style.left = Math.min(ev.clientX + 16, innerWidth - 330) + "px";
       tip.style.top = (ev.clientY + 18) + "px";
     });
     grp.addEventListener("mouseleave", () => tip.hidden = true);
+    const open = () => {
+      $$(".g-node.sel", svg).forEach(x => x.classList.remove("sel"));
+      grp.classList.add("sel");
+      showDetail(n);
+    };
+    grp.addEventListener("click", open);
+    grp.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); open(); } });
     items.push([n.order, grp]);
   }
 
-  // edge label tooltips (macro routes)
   $$("path[data-label]", svg).forEach(p => {
     p.addEventListener("mousemove", ev => {
       tip.hidden = false;
       const col = p.dataset.kind === "fail" ? "#e08a7c" : "#9fd4a2";
-      tip.innerHTML = `<b style="color:${col}">${p.dataset.label}</b><br>${p.dataset.kind === "fail" ? "failure route" : "success route"}`;
+      tip.innerHTML = `<b style="color:${col}">${esc(p.dataset.label)}</b><br>${p.dataset.kind === "fail" ? "failure route" : "success route"}`;
       tip.style.left = Math.min(ev.clientX + 16, innerWidth - 330) + "px";
       tip.style.top = (ev.clientY + 18) + "px";
     });
@@ -183,84 +242,4 @@ async function buildGraph() {
   }
 }
 buildGraph().catch(console.error);
-
-/* ── self-learning scrubber ──────────────────────────────────────────── */
-async function buildScrubber() {
-  const slider = $("#sl-slider");
-  if (!slider) return;
-  const data = await (await fetch("assets/data/selflearn.json")).json();
-  const iters = data.iters;
-  const mini = $("#sl-mini"), zoom = $("#sl-zoom"), note = $("#sl-note"),
-        chips = $("#sl-chips"), iterChip = $("#sl-iter"), curve = $("#sl-curve");
-
-  const W = 460, H = 210, L = 38, R = 12, T = 14, B = 30;
-  const X = i => L + (W - L - R) * i / (iters.length - 1);
-  const Y = v => H - B - (H - T - B) * v / 100;
-  // static axes
-  for (const p of [0, 25, 50, 75, 100]) {
-    mk("line", { x1: L, y1: Y(p), x2: W - R, y2: Y(p), stroke: "#e4e6ea", "stroke-width": 1 }, curve);
-    const t = mk("text", { x: L - 7, y: Y(p) + 4, "text-anchor": "end",
-      "font-size": 10, fill: "#9aa0a8", "font-family": "IBM Plex Mono, monospace" }, curve);
-    t.textContent = p;
-  }
-  iters.forEach((_, i) => {
-    const t = mk("text", { x: X(i), y: H - 10, "text-anchor": "middle",
-      "font-size": 10, fill: "#9aa0a8", "font-family": "IBM Plex Mono, monospace" }, curve);
-    t.textContent = i;
-  });
-  const mcPath = mk("polyline", { fill: "none", stroke: "#2e7d32", "stroke-width": 3, "stroke-linejoin": "round" }, curve);
-  const srPath = mk("polyline", { fill: "none", stroke: "#2e6db4", "stroke-width": 3, "stroke-linejoin": "round" }, curve);
-  const dotsG = mk("g", {}, curve);
-
-  const pad2 = n => String(n).padStart(2, "0");
-  const update = k => {
-    const it = iters[k];
-    mini.src = `assets/img/minimaps/mini_${pad2(k)}.png`;
-    iterChip.textContent = `iteration ${k} / ${iters.length - 1}`;
-    chips.innerHTML = it.changed.length
-      ? `<span class="mono" style="color:#8a9099;font-size:12.5px;width:100%">agents patched:</span>` +
-        it.changed.slice(0, 4).map(c => `<span class="pchip">${c}</span>`).join("")
-      : "";
-    if (it.zoom) {
-      zoom.src = `assets/img/minimaps/zoom_${pad2(k)}_${it.zoom}.png`;
-      zoom.hidden = false;
-      note.textContent = "zoom: patched subgraph";
-    } else {
-      zoom.hidden = true;
-      note.textContent = k === 0 ? "initial graph — synthesized from the task prompt"
-                                 : "no patch this round — rehearse again";
-    }
-    mcPath.setAttribute("points", iters.slice(0, k + 1).map((e, i) => `${X(i)},${Y(e.mc)}`).join(" "));
-    srPath.setAttribute("points", iters.slice(0, k + 1).map((e, i) => `${X(i)},${Y(e.sr)}`).join(" "));
-    dotsG.innerHTML = "";
-    iters.slice(0, k + 1).forEach((e, i) => {
-      mk("circle", { cx: X(i), cy: Y(e.mc), r: 4, fill: "#2e7d32" }, dotsG);
-      mk("circle", { cx: X(i), cy: Y(e.sr), r: 4, fill: "#2e6db4" }, dotsG);
-    });
-  };
-  slider.addEventListener("input", () => { stop(); update(+slider.value); });
-  update(0);
-
-  let timer = null;
-  const playBtn = $("#sl-play");
-  const stop = () => { if (timer) { clearInterval(timer); timer = null; playBtn.textContent = "▶ play"; } };
-  playBtn.addEventListener("click", () => {
-    if (timer) { stop(); return; }
-    playBtn.textContent = "⏸ pause";
-    if (+slider.value >= iters.length - 1) slider.value = 0;
-    update(+slider.value);
-    timer = setInterval(() => {
-      const k = +slider.value + 1;
-      if (k >= iters.length) { stop(); return; }
-      slider.value = k;
-      update(k);
-    }, 900);
-  });
-  // auto-play once when scrolled into view
-  const sio = new IntersectionObserver(es => es.forEach(e => {
-    if (e.isIntersecting) { if (!timer) playBtn.click(); sio.disconnect(); }
-  }), { threshold: 0.35 });
-  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) sio.observe($("#scrubber"));
-}
-buildScrubber().catch(console.error);
 })();

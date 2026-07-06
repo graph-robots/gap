@@ -36,10 +36,8 @@
     <span class="chip">51 modular skills · MORSL</span>
     <span class="chip">sim + real · one graph</span>
   </div>
-  <h1 class="reveal" style="--d:.06s">Graph-<span class="thin">as</span>-Policy</h1>
-  <p class="tagline reveal" style="--d:.12s">A multi-agent, self-learning harness for <em>Variational Automation</em> tasks — a language prompt becomes an interpretable computation graph of modular robot skills.</p>
-
-  <p class="tldr reveal" style="--d:.18s"><span class="tl">TL;DR</span> <b>GaP (Graph-as-Policy)</b> targets <b>Variational Automation (VA)</b> — tasks a robot must perform <b>persistently and reliably across many varying instances</b> (objects vary in geometry and pose), not just solve once. GaP is a multi-agent coding harness that turns a natural-language task into a <b>directed computation graph of modular skills</b> (MORSL), <b>self-improves it through simulation rehearsal</b>, and ships it to an edge device for persistent execution — <b>outperforming VLA, TAMP, and single-agent code-as-policy baselines</b> across <b>8 VA benchmarks</b>.</p>
+  <h1 class="reveal" style="--d:.06s">Graph-as-Policy</h1>
+  <p class="tagline reveal" style="--d:.12s">A multi-agent, self-learning harness for <em>Variational Automation</em> tasks</p>
 
   <div class="authors reveal" style="--d:.24s">
     <p>Kaiyuan Chen<sup>*1</sup> · Shuangyu Xie<sup>*1</sup> · Letian Fu<sup>1</sup> · Justin Yu<sup>1</sup> · William Pacini<sup>1</sup> · Sandeep Bajamahal<sup>1</sup> · Hudson Kim<sup>1</sup> · Jaimyn Drake<sup>1</sup> · Daehwa Kim<sup>3</sup> · Haoru Xue<sup>1</sup> · Jonathan Francis<sup>3,4</sup> · Christian Juette<sup>4</sup> · Peter Schaldenbrand<sup>3,4</sup> · Muhammet Yunus Seker<sup>3,4</sup> · Ruwan Wickramarachchi<sup>4</sup> · Uksang Yoo<sup>1,3</sup> · Guanzhi Wang<sup>2</sup> · Adithyavairavan Murali<sup>2</sup> · Balakumar Sundaralingam<sup>2</sup> · S.&nbsp;Shankar Sastry<sup>1</sup> · Spencer Huang<sup>2</sup> · Yuke Zhu<sup>2</sup> · Linxi “Jim” Fan<sup>2</sup> · Ken Goldberg<sup>1</sup></p>
@@ -47,18 +45,18 @@
   </div>
 
   <div class="logos reveal" style="--d:.3s">
-    <img src="assets/img/logos/berkeley_w.png" alt="UC Berkeley" style="height:40px">
-    <img src="assets/img/logos/bair_w.png" alt="Berkeley AI Research" style="height:52px">
-    <img src="assets/img/logos/nvidia_w.png" alt="NVIDIA" style="height:25px">
-    <img src="assets/img/logos/cmu_w.png" alt="Carnegie Mellon University" style="height:28px">
-    <img src="assets/img/logos/bosch_w.png" alt="Bosch" style="height:25px">
+    <img src="assets/img/logos/berkeley_c.png" alt="UC Berkeley" style="height:40px">
+    <img src="assets/img/logos/bair_c.png" alt="Berkeley AI Research" style="height:52px">
+    <img src="assets/img/logos/nvidia_c.png" alt="NVIDIA" style="height:25px">
+    <img src="assets/img/logos/cmu_c.png" alt="Carnegie Mellon University" style="height:28px">
+    <img src="assets/img/logos/bosch_c.png" alt="Bosch" style="height:25px">
   </div>
 
   <div class="btns reveal" style="--d:.36s">
     <a class="btn btn-primary" href="assets/gap_corl2026_preprint.pdf" target="_blank" rel="noopener">📄 Paper</a>
     <a class="btn btn-disabled" title="coming soon" aria-disabled="true">arXiv · soon</a>
     <a class="btn" href="https://github.com/graph-robots/graph-as-policy" target="_blank" rel="noopener">&lt;/&gt; Code</a>
-    <a class="btn" href="https://github.com/graph-robots/open-robot-skills" target="_blank" rel="noopener">🧩 MORSL Skills</a>
+    <a class="btn" href="https://github.com/graph-robots/open-robot-skills" target="_blank" rel="noopener">🧩 Open Skills</a>
     <a class="btn" href="https://graph-robots.github.io/graph-as-policy/" target="_blank" rel="noopener">📚 Docs</a>
     <a class="btn" href="#bibtex">❞ BibTeX</a>
   </div>
@@ -86,7 +84,7 @@
 <!-- ═══════════ GRAPH EXPLORER ═══════════ -->
 <section id="graph" class="wrap">
   <div class="lane-title reveal"><span class="dot"></span><span class="lt-chip">02 · the artifact</span><h2>A prompt becomes a computation graph</h2></div>
-  <p class="lead reveal">Give GaP a task description. An orchestration agent partitions it into skill-aware segments; skill agents synthesize localized subgraphs from MORSL; the orchestrator wires them into one executable, type-checked graph. Below is the <b>actual grocery-packing graph</b> — rendered live from its <code>workflow.json</code>. <b>Hover any node</b> to inspect it.</p>
+  <p class="lead reveal">Give GaP a task description. An orchestration agent partitions it into skill-aware segments; skill agents synthesize localized subgraphs from MORSL; the orchestrator wires them into one executable, type-checked graph. Below is the <b>actual grocery-packing graph</b> — rendered live from its <code>workflow.json</code>. <b>Click any node</b> to inspect its code, inputs, and routing.</p>
 
   <div class="prompt-card reveal">
     <span class="chip chip-green mono">TASK</span>
@@ -106,7 +104,9 @@
       <span><i class="sw" style="background:#fde7c4;border-color:#c8841a"></i>router</span>
       <span><i class="sw line" style="background:#2e7d32"></i>success route</span>
       <span><i class="sw line" style="background:#c0392b"></i>failure route</span>
+      <span style="margin-left:auto;color:#8a919b">click a node to inspect →</span>
     </div>
+    <div id="node-detail" class="detail" aria-live="polite"></div>
   </div>
   <div id="graph-tip" class="tip mono" hidden></div>
   <p class="caption reveal">One interpretable graph — perception, grasp, transport, recovery routes — with a backward edge that loops until every item is packed. Failure routes converge on <span class="mono" style="color:var(--fail)">abort</span>; success exits at <span class="mono" style="color:var(--ok)">done</span>.</p>
@@ -127,37 +127,19 @@
   <div class="lane-title reveal"><span class="dot"></span><span class="lt-chip">03 · self-learning</span><h2>Rehearse, localize failures, refine the graph</h2></div>
   <p class="lead reveal">On the long-horizon <b>Make Popcorn</b> task, GaP’s initial graph turns the stove knob on and off but mis-grasps the pan, succeeding only 33% of the time. Through 10 iterations of internal simulation rehearsal, GaP autonomously diagnoses failures from contact feedback and edits the graph — reaching <b>94% in simulation and 90% (18/20) on the real robot</b>.</p>
 
-  <div class="sl-grid">
-    <div class="artifact reveal" id="scrubber">
-      <div class="artifact-bar">
-        <span class="mono asrc">graph evolution — drag through a real 12-iteration run</span>
-        <button class="btn btn-mini" id="sl-play">▶ play</button>
-      </div>
-      <div class="sl-body">
-        <img id="sl-mini" src="assets/img/minimaps/mini_00.png" alt="Policy graph at the selected self-learning iteration">
-        <div class="sl-side">
-          <div class="iter-chip mono" id="sl-iter">iteration 0 / 11</div>
-          <div id="sl-zoomwrap"><img id="sl-zoom" src="" alt="Zoom of the patched subgraph" hidden><p class="mono sl-note" id="sl-note">initial graph — synthesized from the task prompt</p></div>
-          <div id="sl-chips"></div>
-          <svg id="sl-curve" viewBox="0 0 460 210" aria-label="Success rate across iterations"></svg>
-          <p class="mono sl-runlabel">reproduction run · make popcorn (sim) — <span style="color:var(--tool)">full-task success</span> · <span style="color:var(--ok)">task completion</span></p>
-        </div>
-      </div>
-      <input type="range" id="sl-slider" min="0" max="11" value="0" step="1" aria-label="Self-learning iteration">
-    </div>
+  <figure class="figcard wide reveal"><img src="assets/img/self_learning_popcorn.png" alt="Pan-pose variations and the on-burner success-rate curve climbing from 30% to 94% across ten rehearsal iterations" loading="lazy">
+    <figcaption>Pan-pose variations (left) drive a 10-iteration sequence of graph updates; on-burner success rate (right) climbs 30% → 94% through three phases — grasp improvement, transport adjustment, and placement refinement.</figcaption>
+  </figure>
 
-    <div class="sl-right">
-      <figure class="figcard reveal"><img src="assets/img/self_learning_popcorn.png" alt="Pan-pose variations and the on-burner success-rate curve climbing from 30% to 94% across ten rehearsal iterations" loading="lazy">
-        <figcaption>Isaac rehearsal experiment: pan-pose variations drive ten iterations of graph updates; on-burner success climbs 30% → 94% through three phases.</figcaption>
-      </figure>
-      <div class="stage reveal"><span class="chip">iter 1–3</span><p><b>Grasp improvement.</b> Contact feedback reports the gripper missing the pan; GaP swaps the grasp skill for GraspGen + an oriented-bounding-box planner.</p></div>
-      <div class="stage reveal"><span class="chip chip-amber">iter 4</span><p><b>Transport adjustment.</b> GaP recognizes the pan must be grasped by its handle and re-targets perception to the handle specifically.</p></div>
-      <div class="stage reveal"><span class="chip chip-green">iter 4–8</span><p><b>Placement refinement.</b> GaP fine-tunes the placement offset for the new grasp until the pan centers on the burner — 94% sim, 90% real.</p></div>
-      <figure class="vidpanel small reveal"><span class="corner-chip mono">✓ successful rehearsal</span>
-        <video data-autoplay src="assets/video/working_placement.mp4" poster="assets/img/posters/working_placement.jpg" muted loop playsinline preload="none"></video>
-      </figure>
-    </div>
+  <div class="split reveal">
+    <figure class="vidpanel"><span class="corner-chip mono">SIMULATION · rehearsal</span>
+      <video data-autoplay src="assets/video/working_placement.mp4" poster="assets/img/posters/working_placement.jpg" muted loop playsinline preload="none"></video>
+    </figure>
+    <figure class="vidpanel"><span class="corner-chip mono chip-greenish">REAL ROBOT · 16×</span>
+      <video data-autoplay src="assets/video/popcorn_real.mp4" poster="assets/img/posters/popcorn_real.jpg" muted loop playsinline preload="none"></video>
+    </figure>
   </div>
+  <p class="caption reveal">The refined graph placing the pan on the burner — in the rehearsal simulator, and on the physical robot.</p>
 </section>
 
 <!-- ═══════════ BENCHMARK ═══════════ -->
@@ -203,7 +185,16 @@
       <div class="stat"><b>3</b><span>robot embodiments<br>Franka · UR5 · bimanual Franka</span></div>
     </aside>
   </div>
-  <p class="caption reveal">Sim-variation previews: <a href="assets/video/var_pick_up_the_alphabet_soup_and_place_it_in_the_basket.mp4" target="_blank" rel="noopener">alphabet soup</a> · <a href="assets/video/var_pick_up_the_chocolate_pudding_and_place_it_in_the_basket.mp4" target="_blank" rel="noopener">chocolate pudding</a> · <a href="assets/video/var_popcorn_all_init_states_clean.mp4" target="_blank" rel="noopener">popcorn initial states</a></p>
+  <h3 class="reveal" style="margin-top:52px;font-size:24px">What positional variation looks like</h3>
+  <p class="lead reveal" style="font-size:16px;margin-top:10px">Every simulated instance re-samples object poses and arrangements — the same policy graph must absorb the disturbance. Sampled initial states from the benchmark:</p>
+  <div class="varrow reveal">
+    <figure><video data-autoplay src="assets/video/var_pick_up_the_alphabet_soup_and_place_it_in_the_basket.mp4" poster="assets/img/posters/var_pick_up_the_alphabet_soup_and_place_it_in_the_basket.jpg" muted loop playsinline preload="none"></video>
+      <figcaption class="mono">“Pick up the alphabet soup and place it in the basket.” — pose-randomized episodes</figcaption></figure>
+    <figure><video data-autoplay src="assets/video/var_pick_up_the_chocolate_pudding_and_place_it_in_the_basket.mp4" poster="assets/img/posters/var_pick_up_the_chocolate_pudding_and_place_it_in_the_basket.jpg" muted loop playsinline preload="none"></video>
+      <figcaption class="mono">“Pick up the chocolate pudding and place it in the basket.” — pose-randomized episodes</figcaption></figure>
+    <figure><video data-autoplay src="assets/video/var_popcorn_all_init_states_clean.mp4" poster="assets/img/posters/var_popcorn_all_init_states_clean.jpg" muted loop playsinline preload="none"></video>
+      <figcaption class="mono">Make Popcorn — sampled initial pan / knob / stove states</figcaption></figure>
+  </div>
 </section>
 
 <!-- ═══════════ METHOD ═══════════ -->
@@ -328,11 +319,11 @@
 <footer>
   <div class="wrap">
     <div class="logos">
-      <img src="assets/img/logos/berkeley_w.png" alt="UC Berkeley" style="height:36px">
-      <img src="assets/img/logos/bair_w.png" alt="BAIR" style="height:48px">
-      <img src="assets/img/logos/nvidia_w.png" alt="NVIDIA" style="height:22px">
-      <img src="assets/img/logos/cmu_w.png" alt="Carnegie Mellon University" style="height:27px">
-      <img src="assets/img/logos/bosch_w.png" alt="Bosch" style="height:22px">
+      <img src="assets/img/logos/berkeley_c.png" alt="UC Berkeley" style="height:36px">
+      <img src="assets/img/logos/bair_c.png" alt="BAIR" style="height:48px">
+      <img src="assets/img/logos/nvidia_c.png" alt="NVIDIA" style="height:22px">
+      <img src="assets/img/logos/cmu_c.png" alt="Carnegie Mellon University" style="height:27px">
+      <img src="assets/img/logos/bosch_c.png" alt="Bosch" style="height:22px">
     </div>
     <p class="mono">GaP · Graph-as-Policy — <a href="https://github.com/graph-robots/graph-as-policy">code</a> · <a href="https://github.com/graph-robots/open-robot-skills">skills</a> · <a href="https://graph-robots.github.io/graph-as-policy/">docs</a> · <a href="https://github.com/graph-robots/gap">page source</a></p>
     <p class="mono faint">done <span style="color:var(--ok)">(success)</span> — thanks for scrolling the whole graph.</p>
