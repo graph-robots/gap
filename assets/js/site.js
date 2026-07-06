@@ -10,20 +10,14 @@ const revIO = new IntersectionObserver(es => es.forEach(e => {
 }), { threshold: 0.12 });
 $$(".reveal").forEach(el => revIO.observe(el));
 
-/* ── video autoplay / hover management ───────────────────────────────── */
-const touch = matchMedia("(hover: none)").matches;
+/* ── video autoplay management (all videos loop while visible) ───────── */
 const vidIO = new IntersectionObserver(es => es.forEach(e => {
   const v = e.target;
   if (e.isIntersecting) v.play().catch(() => {});
   else v.pause();
 }), { threshold: 0.3 });
 $$("video[data-autoplay]").forEach(v => vidIO.observe(v));
-$$(".bcard .bmedia video").forEach(v => {
-  if (touch) { vidIO.observe(v); return; }
-  const card = v.closest(".bcard");
-  card.addEventListener("mouseenter", () => v.play().catch(() => {}));
-  card.addEventListener("mouseleave", () => v.pause());
-});
+$$(".bcard .bmedia video").forEach(v => vidIO.observe(v));   // benchmark cards loop when visible
 
 /* ── crate view tabs ─────────────────────────────────────────────────── */
 const crateVid = $("#crate-video");
