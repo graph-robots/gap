@@ -28,9 +28,8 @@ paths serve as-is.
 
 ## Updating
 
-- **arXiv link**: in `index.html`, turn the disabled `#paper-btn` into a live
-  link: `<a class="btn btn-primary" href="https://arxiv.org/abs/XXXX.XXXXX"
-  target="_blank" rel="noopener">📄 Paper (arXiv)</a>`.
+- **arXiv link**: live — `#paper-btn` and the BibTeX block point at
+  <https://arxiv.org/abs/2607.05369>.
 - **Graph explorer**: re-export with
   `python export_graph_json.py <workflow.json> assets/data/packing_graph.json`
   (script lives with the launch-video pipeline; uses `gap.viz.render` layout).
