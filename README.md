@@ -28,7 +28,7 @@ paths serve as-is.
 
 ## Updating
 
-- **Venue**: accepted to CoRL 2026 — hero `.venue` line and the BibTeX
+- **Venue**: CoRL 2026 Spotlight — hero `.venue-badge` and the BibTeX
   block (`@inproceedings`, `booktitle = {Conference on Robot Learning (CoRL)}`).
 - **arXiv link**: live — `#paper-btn` and the BibTeX `url` point at
   <https://arxiv.org/abs/2607.05369>.
