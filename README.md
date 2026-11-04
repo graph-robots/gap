@@ -28,7 +28,9 @@ paths serve as-is.
 
 ## Updating
 
-- **arXiv link**: live — `#paper-btn` and the BibTeX block point at
+- **Venue**: accepted to CoRL 2026 — hero `.venue` line and the BibTeX
+  block (`@inproceedings`, `booktitle = {Conference on Robot Learning (CoRL)}`).
+- **arXiv link**: live — `#paper-btn` and the BibTeX `url` point at
   <https://arxiv.org/abs/2607.05369>.
 - **Graph explorer**: re-export with
   `python export_graph_json.py <workflow.json> assets/data/packing_graph.json`
